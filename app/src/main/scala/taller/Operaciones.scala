@@ -57,5 +57,32 @@ class Operaciones {
     aplicarMovimientosAux(movs, List(e))
   }
 
-  
+  def definirManiobra(t1: Tren, t2: Tren): Option[Maniobra] = {
+    val estadoInicial: Estado = (t1, Nil, Nil)
+    val estadoFinal: Estado = (t2, Nil, Nil)
+
+    case class Nodo(estado: Estado, maniobra: Maniobra)
+
+    @tailrec
+    def bfs(pendientes: List[Nodo], visitados: Set[Estado]): Option[Maniobra] = pendientes match {
+      case Nil => None 
+      case Nodo(estado, maniobra) :: resto =>
+        if (estado == estadoFinal) Some(maniobra.reverse)
+        else if (visitados.contains(estado)) bfs(resto, visitados)
+        else {
+          val nuevosNodos = for {
+            mov <- posiblesMovimientos
+            nuevoEstado <- aplicarMovimientoFunc(estado, mov)
+            if !visitados.contains(nuevoEstado)
+          } yield Nodo(nuevoEstado, mov :: maniobra)
+
+          bfs(resto ++ nuevosNodos, visitados + estado)
+        }
+    }
+
+    def aplicarMovimientoFunc(e: Estado, m: Movimiento): Option[Estado] =
+      Some(aplicarMovimiento(e, m))
+
+    bfs(List(Nodo(estadoInicial, Nil)), Set.empty)
+  }
 }
