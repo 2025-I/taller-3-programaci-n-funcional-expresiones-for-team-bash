@@ -49,8 +49,4 @@ class Operaciones {
       }
       aplicarMovimientosAux(movs, List (e))
   }  
-
-  
-
-  
 }
